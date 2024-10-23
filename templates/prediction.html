@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction - Insurance CLV</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url('static/images/istockphoto-1255609096-170667a.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            color: black; /* Set text color to black */
+        }
+        .container {
+            margin-top: 100px; /* Space from the top */
+        }
+        .form-group {
+            margin-bottom: 20px; /* Space between input groups */
+        }
+        /* Navigation Button Styling */
+        .nav-button {
+            display: inline-block;
+            margin: 10px 0; /* Space between buttons */
+            font-size: 0.9rem; /* Smaller font size */
+            font-weight: 600;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: black; /* Change text color to black */
+            border: 2px solid black; /* Black border for visibility */
+            background-color: transparent; /* Transparent background */
+            padding: 10px 20px; /* Padding for buttons */
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px; /* Rounded corners */
+        }
+        .nav-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff; /* White background for animation */
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+        .nav-button:hover {
+            color: #333; /* Change text color on hover */
+        }
+        .nav-button:hover:before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .nav-button:hover {
+            transform: scale(1.1); /* Slightly grow the button on hover */
+        }
+        /* Fixed Positioning for Developer Info Button */
+        .developer-button-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+        /* Centering the Back to Home Button */
+        .back-to-home-container {
+            text-align: center;
+            margin-top: 20px; /* Space above the button */
+        }
+        /* Predicted Value Box */
+        .prediction-box {
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent background */
+            border: 2px solid black; /* Black border for visibility */
+            border-radius: 10px; /* Rounded corners */
+            padding: 20px; /* Padding inside the box */
+            margin-top: 20px; /* Space above the box */
+            text-align: center; /* Center the text */
+            font-size: 1.5rem; /* Larger font size for prediction */
+            opacity: 0; /* Start hidden */
+            animation: fadeIn 0.5s forwards; /* Animation */
+        }
+        /* Fade In Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0; /* Start from transparent */
+            }
+            to {
+                opacity: 1; /* End at fully visible */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mb-4">Predict Customer Lifetime Value (CLV)</h2>
+        
+        <form method="POST" action="/predict">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="Total_Claim_Amount">Total Claim Amount ($)</label>
+                        <input type="number" step="any" class="form-control" id="Total_Claim_Amount" name="Total_Claim_Amount" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="Income">Income ($)</label>
+                        <input type="number" step="any" class="form-control" id="Income" name="Income" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="Monthly_Premium_Auto">Monthly Premium Auto ($)</label>
+                        <input type="number" step="any" class="form-control" id="Monthly_Premium_Auto" name="Monthly_Premium_Auto" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="Months_Since_Last_Claim">Months Since Last Claim</label>
+                        <input type="number" step="any" class="form-control" id="Months_Since_Last_Claim" name="Months_Since_Last_Claim" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="Months_Since_Policy_Inception">Months Since Policy Inception</label>
+                        <input type="number" step="any" class="form-control" id="Months_Since_Policy_Inception" name="Months_Since_Policy_Inception" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="Number_of_Policies">Number of Policies</label>
+                        <input type="number" step="1" class="form-control" id="Number_of_Policies" name="Number_of_Policies" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="State">State</label>
+                        <select class="form-control" id="State" name="State" required>
+                            <option value="" disabled selected>Select your state</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="California">California</option>
+                            <option value="Washington">Washington</option>
+                            <option value="Oregon">Oregon</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="PolicyType">Policy Type</label>
+                        <select class="form-control" id="PolicyType" name="PolicyType" required>
+                            <option value="" disabled selected>Select policy type</option>
+                            <option value="Personal Auto">Personal Auto</option>
+                            <option value="Corporate Auto">Corporate Auto</option>
+                            <option value="Special Auto">Special Auto</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="VehicleClass">Vehicle Class</label>
+                        <select class="form-control" id="VehicleClass" name="VehicleClass" required>
+                            <option value="" disabled selected>Select vehicle class</option>
+                            <option value="Four-Door Car">Four-Door Car</option>
+                            <option value="Two-Door Car">Two-Door Car</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Luxury SUV">Luxury SUV</option>
+                            <option value="Sports Car">Sports Car</option>
+                            <option value="Luxury Car">Luxury Car</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        {% if prediction_text %}
+        <div class="prediction-box mt-4">
+            Predicted CLV: {{ prediction_text }} 
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="developer-button-container">
+        <a href="/developer" class="nav-button">Developer Info</a> <!-- Developer Info button -->
+    </div>
+
+    <div class="back-to-home-container">
+        <a href="/" class="nav-button">Back to Home</a> <!-- Back to Home button -->
+    </div>
+</body>
+</html>

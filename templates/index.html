@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Premium Prediction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .form-section {
+            flex: 1;
+            padding-right: 30px;
+        }
+        .output-section {
+            flex: 0.5;
+            padding-left: 30px;
+        }
+        .blue-box {
+            border: 2px solid #007bff;
+            background-color: #e7f1ff;
+            padding: 40px;
+            border-radius: 10px;
+            color: #007bff;
+            font-weight: bold;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        .predict-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Insurance Premium Prediction</h2>
+        
+        <div class="form-container">
+            <!-- Left side: Form inputs -->
+            <div class="form-section">
+                <form action="/predict" method="POST">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Total_Claim_Amount">Total Claim Amount</label>
+                                <input type="number" class="form-control" name="Total_Claim_Amount" step="0.01" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Income">Income</label>
+                                <input type="number" class="form-control" name="Income" step="0.01" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Monthly_Premium_Auto">Monthly Premium Auto</label>
+                                <input type="number" class="form-control" name="Monthly_Premium_Auto" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Months_Since_Last_Claim">Months Since Last Claim</label>
+                                <input type="number" class="form-control" name="Months_Since_Last_Claim" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Months_Since_Policy_Inception">Months Since Policy Inception</label>
+                                <input type="number" class="form-control" name="Months_Since_Policy_Inception" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="Number_of_Policies">Number of Policies</label>
+                                <input type="number" class="form-control" name="Number_of_Policies" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="State">State</label>
+                                <select class="form-control" name="State" required>
+                                    <option value="Arizona">Arizona</option>
+                                    <option value="Nevada">Nevada</option>
+                                    <option value="California">California</option>
+                                    <option value="Washington">Washington</option>
+                                    <option value="Oregon">Oregon</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="PolicyType">Policy Type</label>
+                                <select class="form-control" name="PolicyType" required>
+                                    <option value="Personal Auto">Personal Auto</option>
+                                    <option value="Corporate Auto">Corporate Auto</option>
+                                    <option value="Special Auto">Special Auto</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="VehicleClass">Vehicle Class</label>
+                                <select class="form-control" name="VehicleClass" required>
+                                    <option value="Four-Door Car">Four-Door Car</option>
+                                    <option value="Two-Door Car">Two-Door Car</option>
+                                    <option value="SUV">SUV</option>
+                                    <option value="Luxury SUV">Luxury SUV</option>
+                                    <option value="Sports Car">Sports Car</option>
+                                    <option value="Luxury Car">Luxury Car</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Predict button centered below the inputs -->
+                    <div class="predict-btn">
+                        <button type="submit" class="btn btn-primary btn-lg">Predict</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right side: Prediction output -->
+            <div class="output-section">
+                {% if prediction_text %}
+                    <div class="blue-box">
+                        {{ prediction_text }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

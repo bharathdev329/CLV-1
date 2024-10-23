@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - CLV Information</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url('static/images/istockphoto-1255609096-170667a.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            color: rgb(8, 8, 8); /* Change text color if needed for contrast */
+            height: 100vh; /* Set body height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+        .jumbotron {
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for better text visibility */
+            color: white; /* Ensure text is visible */
+            padding: 30px; /* Add padding for better spacing */
+        }
+        .clv-image {
+            width: 100%; /* Full width of the jumbotron */
+            height: 400px; /* Height twice the jumbotron */
+            object-fit: cover; /* Cover the area without distortion */
+            margin-top: 20px; /* Space above the image */
+        }
+        /* Navigation Button Styling */
+        .nav-button {
+            display: inline-block;
+            margin: 10px 0; /* Space between buttons */
+            font-size: 0.9rem; /* Smaller font size */
+            font-weight: 600;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: black; /* Change text color to black */
+            border: 2px solid black; /* Black border for visibility */
+            background-color: transparent; /* Transparent background */
+            padding: 10px 20px; /* Padding for buttons */
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px; /* Rounded corners */
+        }
+        .nav-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff; /* White background for animation */
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+        .nav-button:hover {
+            color: #333; /* Change text color on hover */
+        }
+        .nav-button:hover:before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .nav-button:hover {
+            transform: scale(1.1); /* Slightly grow the button on hover */
+        }
+        /* Fixed Positioning for Prediction Button */
+        .prediction-button-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+        /* Centering the Back to Home Button */
+        .back-to-home-container {
+            text-align: center;
+            margin-top: 20px; /* Space above the button */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">What is Customer Lifetime Value (CLV)?</h2>
+
+        <div class="jumbotron">
+            <h3>Understanding CLV</h3>
+            <p>Customer Lifetime Value (CLV or CLTV) is a metric that estimates the total revenue a business can expect from a single customer over the duration of their relationship. It's used to measure the long-term financial value of a customer and helps businesses focus on customer retention, marketing, and sales strategies.</p>
+        </div>
+
+        <img src="static/images/Screenshot 2024-10-22 163241.png" alt="CLV Graphic" class="clv-image"> <!-- Replace with your image URL -->
+    </div>
+
+    <div class="prediction-button-container">
+        <a href="/predict" class="nav-button">Get Prediction</a> <!-- Prediction button wrapped in anchor -->
+    </div>
+
+    <div class="back-to-home-container">
+        <a href="/" class="nav-button">Back to Home</a> <!-- Back to Home button -->
+    </div>
+</body>
+</html>
