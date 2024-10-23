@@ -1,6 +1,9 @@
 import pickle
+from flask import Flask, request, render_template
 import numpy as np
-import streamlit as st
+
+# Initialize Flask app
+app = Flask(__name__)
 
 # Load the ensemble model
 with open('ensemble_model5.pkl', 'rb') as model_file:
@@ -20,68 +23,73 @@ with open('Target_Encoder_Vehicle Class1.pkl', 'rb') as vehicle_class_encoder_fi
 with open('minmax_scale2.pkl', 'rb') as scaler_file:
     scaler = pickle.load(scaler_file)
 
-# Streamlit app interface
-st.title("Customer Lifetime Value")
+# Route for the homepage
+@app.route('/')
+def home():
+    return render_template('homepage.html')
 
-# Dropdown options for State, Policy Type, and Vehicle Class
-state_options = ['Arizona', 'Nevada', 'California', 'Washington', 'Oregon']
-policy_type_options = ['Personal Auto', 'Corporate Auto', 'Special Auto']
-vehicle_class_options = ['Four-Door Car', 'Two-Door Car', 'SUV', 'Luxury SUV', 'Sports Car', 'Luxury Car']
+# Route for the prediction page
+@app.route('/predict', methods=['GET', 'POST'])
+def predict():
+    if request.method == 'POST':
+        # Get data from the form
+        total_claim_amount = float(request.form['Total_Claim_Amount'])
+        income = float(request.form['Income'])
+        monthly_premium_auto = float(request.form['Monthly_Premium_Auto'])
+        months_since_last_claim = float(request.form['Months_Since_Last_Claim'])
+        months_since_policy_inception = float(request.form['Months_Since_Policy_Inception'])
+        number_of_policies = int(request.form['Number_of_Policies'])
+        state = request.form['State']
+        policy_type = request.form['PolicyType']
+        vehicle_class = request.form['VehicleClass']
 
-# User inputs
-total_claim_amount = st.text_input('Total Claim Amount', value='0')
-income = st.text_input('Income', value='0')
-monthly_premium_auto = st.text_input('Monthly Premium Auto', value='0')
-months_since_last_claim = st.text_input('Months Since Last Claim', value='0')
-months_since_policy_inception = st.text_input('Months Since Policy Inception', value='0')
-number_of_policies = st.number_input('Number of Policies', min_value=1, value=1)
+        # Reshape the state, policy_type, and vehicle_class input to 2D array (required by TargetEncoder)
+        state_encoded = state_encoder.transform(np.array([[state]]))[0]
+        policy_type_encoded = policy_type_encoder.transform(np.array([[policy_type]]))[0]
+        vehicle_class_encoded = vehicle_class_encoder.transform(np.array([[vehicle_class]]))[0]
 
-# Dropdown inputs
-state = st.selectbox('State', state_options)
-policy_type = st.selectbox('Policy Type', policy_type_options)
-vehicle_class = st.selectbox('Vehicle Class', vehicle_class_options)
+        # Prepare features for scaling (only the features that MinMaxScaler was trained on)
+        features_to_scale = [
+            total_claim_amount, 
+            income, 
+            monthly_premium_auto, 
+            months_since_last_claim, 
+            months_since_policy_inception
+        ]
 
-# Predict button
-if st.button('Predict'):
-    # Convert input to float or int
-    total_claim_amount = float(total_claim_amount)
-    income = float(income)
-    monthly_premium_auto = float(monthly_premium_auto)
-    months_since_last_claim = float(months_since_last_claim)
-    months_since_policy_inception = float(months_since_policy_inception)
+        # Scale only the relevant features (scaler expects a 2D array)
+        scaled_features = scaler.transform([features_to_scale])[0]
 
-    # Encode categorical features
-    state_encoded = state_encoder.transform(np.array([[state]]))[0]
-    policy_type_encoded = policy_type_encoder.transform(np.array([[policy_type]]))[0]
-    vehicle_class_encoded = vehicle_class_encoder.transform(np.array([[vehicle_class]]))[0]
+        # Create the final model input array
+        model_input = np.array([
+            scaled_features[0],  # Scaled Total_Claim_Amount
+            scaled_features[1],  # Scaled Income
+            scaled_features[2],  # Scaled Monthly_Premium_Auto
+            scaled_features[3],  # Scaled Months_Since_Last_Claim
+            scaled_features[4],  # Scaled Months_Since_Policy_Inception
+            number_of_policies,      # Number of Policies (non-scaled)
+            *state_encoded,           # Encoded State (non-scaled)
+            *policy_type_encoded,     # Encoded PolicyType (non-scaled)
+            *vehicle_class_encoded    # Encoded VehicleClass (non-scaled)
+        ]).reshape(1, -1)
 
-    # Prepare features for scaling
-    features_to_scale = [
-        total_claim_amount,
-        income,
-        monthly_premium_auto,
-        months_since_last_claim,
-        months_since_policy_inception
-    ]
+        # Make prediction
+        prediction = model.predict(model_input)[0]
 
-    # Scale numeric features
-    scaled_features = scaler.transform([features_to_scale])[0]
+        # Return the result with prediction on the same page
+        return render_template('prediction.html', prediction_text=f'Predicted CLV: ${prediction:.2f}')
+    
+    return render_template('prediction.html')
 
-    # Combine scaled features with encoded categorical features
-    model_input = np.array([
-        scaled_features[0],  # Scaled Total_Claim_Amount
-        scaled_features[1],  # Scaled Income
-        scaled_features[2],  # Scaled Monthly_Premium_Auto
-        scaled_features[3],  # Scaled Months_Since_Last_Claim
-        scaled_features[4],  # Scaled Months_Since_Policy_Inception
-        number_of_policies,  # Number of Policies
-        *state_encoded,      # Encoded State
-        *policy_type_encoded,  # Encoded Policy Type
-        *vehicle_class_encoded  # Encoded Vehicle Class
-    ]).reshape(1, -1)
+# Route for the about page
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
-    # Make the prediction
-    prediction = model.predict(model_input)[0]
+# Route for the developer page
+@app.route('/developer')
+def developer():
+    return render_template('developer.html')
 
-    # Display the result
-    st.write(f'Predicted CLV: ${prediction:.2f}')
+if __name__ == '__main__':
+    app.run(debug=True)
